@@ -1,8 +1,9 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import AdminSidebar from "@/Components/AdminSidebarLayout";
+import AdminSidebarLayout from "@/Components/AdminSidebarLayout"; // ✅ correct layout import
 
+// 🧩 Type definitions
 type User = {
   _id: string;
   name: string;
@@ -15,13 +16,15 @@ type Product = {
   price: number;
 };
 
+type OrderStatus = "Pending" | "Shipped" | "Delivered" | "Cancelled";
+
 type Order = {
   _id: string;
   user: User;
   products: Product[];
   totalAmount: number;
   paymentMode: string;
-  status: "Pending" | "Shipped" | "Delivered" | "Cancelled";
+  status: OrderStatus;
   createdAt: string;
 };
 
@@ -42,7 +45,7 @@ const AdminOrders = () => {
     }
   };
 
-  const updateOrderStatus = async (orderId: string, status: string) => {
+  const updateOrderStatus = async (orderId: string, status: OrderStatus) => {
     try {
       await axios.put(
         `https://smart-backend-3.onrender.com/api/admin/orders/${orderId}`,
@@ -75,10 +78,8 @@ const AdminOrders = () => {
   }, []);
 
   return (
-    <div className="flex min-h-screen">
-      <AdminSidebar />
-
-      <main className="flex-1 bg-gray-50 p-6">
+    <AdminSidebarLayout>
+      <main className="flex-1 bg-gray-50 p-6 min-h-screen">
         <h1 className="text-3xl font-semibold mb-6 text-gray-800">📦 Admin Orders</h1>
 
         {loading ? (
@@ -96,8 +97,9 @@ const AdminOrders = () => {
                     : "bg-white border-gray-200"
                 }`}
               >
-                {order.status === "cancelled" && (
-                  <div className="absolute top-0  left-0 right-0 px-4 py-2 bg-red-500 text-white text-sm font-semibold rounded-t-xl">
+                {/* ✅ Case-sensitive fix */}
+                {order.status === "Cancelled" && (
+                  <div className="absolute top-0 left-0 right-0 px-4 py-2 bg-red-500 text-white text-sm font-semibold rounded-t-xl">
                     ❌ This order has been cancelled.
                   </div>
                 )}
@@ -139,7 +141,7 @@ const AdminOrders = () => {
                         <span className="text-sm font-medium text-gray-700">🚚 Status:</span>
                         <select
                           value={order.status}
-                          onChange={(e) => updateOrderStatus(order._id, e.target.value)}
+                          onChange={(e) => updateOrderStatus(order._id, e.target.value as OrderStatus)}
                           className="border border-gray-300 rounded px-3 py-1 text-sm bg-white"
                         >
                           <option value="Pending">Pending</option>
@@ -167,7 +169,7 @@ const AdminOrders = () => {
           </div>
         )}
       </main>
-    </div>
+    </AdminSidebarLayout>
   );
 };
 

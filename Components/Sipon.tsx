@@ -65,7 +65,7 @@ const Sipon = () => {
       alert(`✅ Order placed successfully! Order ID: ${data.order._id}`);
       setCart([]);
       setShowBill(false);
-    } catch (error) {
+    } catch (error:any) {
       console.error("Order failed:", error?.response?.data || error.message);
       alert("❌ Failed to place order.");
     } finally {

@@ -71,7 +71,7 @@ const Bindu = () => {
       setCart([]);
       setShowBill(false);
       fetchBinduProducts();
-    } catch (error) {
+    } catch (error:any) {
       console.error("Order failed:", error?.response?.data || error.message);
       alert("❌ Failed to place order.");
     } finally {

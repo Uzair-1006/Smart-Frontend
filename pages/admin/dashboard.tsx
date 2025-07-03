@@ -3,7 +3,15 @@ import axios from "axios";
 import AdminSidebarLayout from "@/Components/AdminSidebarLayout";
 
 const AdminDashboard = () => {
-  const [admin, setAdmin] = useState(null);
+
+  type Admin = {
+  name: string;
+  email: string;
+  id: string;
+};
+
+const [admin, setAdmin] = useState<Admin | null>(null);
+
   const [stats, setStats] = useState({
     totalOrdersToday: 0,
     totalSales: 0,

@@ -8,7 +8,7 @@ const AdminLogin = () => {
     const [error, setError] = useState("");
     const router = useRouter();
 
-    const handleLogin = async (e) => {
+    const handleLogin = async (e:any) => {
         e.preventDefault();
         try {
             await axios.post("https://smart-backend-3.onrender.com/api/admin/login", { email, password }, { withCredentials: true });

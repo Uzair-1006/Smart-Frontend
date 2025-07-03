@@ -1,42 +1,56 @@
 'use client';
+
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { motion } from 'framer-motion';
-import { useRouter } from 'next/router';  // To navigate between routes
+import { useRouter } from 'next/router';
+
+// ✅ Product type for proper typing
+type Product = {
+  _id: string;
+  name: string;
+  price: number;
+  description: string;
+  image: string;
+};
 
 const SmartShopping = () => {
-  const [products, setProducts] = useState([]);
-  const [cart, setCart] = useState([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [cart, setCart] = useState<Product[]>([]);
   const [showBill, setShowBill] = useState(false);
-
-  const router = useRouter();  // Router for navigation
+  const router = useRouter();
 
   useEffect(() => {
-    axios.get('https://smart-backend-3.onrender.com/api/user/allproducts') // ✅ Updated endpoint
+    axios
+      .get('https://smart-backend-3.onrender.com/api/user/allproducts')
       .then((res) => setProducts(res.data.products))
       .catch((err) => console.error('Fetch error', err));
   }, []);
 
-  const addToCart = (product) => {
+  const addToCart = (product: Product) => {
     if (!cart.find((item) => item._id === product._id)) {
       setCart([...cart, product]);
     }
   };
 
-  const removeFromCart = (id) => {
-    setCart(cart.filter(item => item._id !== id));
+  const removeFromCart = (id: string) => {
+    setCart(cart.filter((item) => item._id !== id));
   };
 
-  const handleBuyNow = async (product) => {
+  const handleBuyNow = async (product: Product) => {
     try {
       const token = localStorage.getItem('token');
-      await axios.post('https://smart-backend-3.onrender.com/api/user/orders', {
-        products: [product._id],
-        totalAmount: product.price,
-        paymentMode: 'Cash',
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await axios.post(
+        'https://smart-backend-3.onrender.com/api/user/orders',
+        {
+          products: [product._id],
+          totalAmount: product.price,
+          paymentMode: 'Cash',
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       alert('✅ Order placed!');
     } catch (err) {
@@ -50,16 +64,21 @@ const SmartShopping = () => {
       const token = localStorage.getItem('token');
       const totalAmount = cart.reduce((acc, curr) => acc + Number(curr.price), 0);
 
-      await axios.post('https://smart-backend-3.onrender.com/api/user/orders', {
-        products: cart.map((p) => p._id),
-        totalAmount,
-        paymentMode: 'Cash',
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await axios.post(
+        'https://smart-backend-3.onrender.com/api/user/orders',
+        {
+          products: cart.map((p) => p._id),
+          totalAmount,
+          paymentMode: 'Cash',
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       alert('✅ Order placed successfully!');
       setCart([]);
+      setShowBill(false);
     } catch (err) {
       console.error('Order error:', err);
       alert('❌ Failed to place order');
@@ -70,7 +89,7 @@ const SmartShopping = () => {
     <div className="min-h-screen bg-gray-50 px-6 py-10">
       <h2 className="text-4xl font-bold mb-10 text-center text-purple-700">🛍️ Smart Shopping</h2>
 
-      {/* Navigation Buttons */}
+      {/* Navigation */}
       <div className="mb-6 flex justify-center space-x-4">
         <button
           onClick={() => router.push('/')}
@@ -133,10 +152,13 @@ const SmartShopping = () => {
         >
           <h3 className="text-xl font-bold mb-3 text-purple-600">🛒 Your Cart</h3>
           <ul className="space-y-2 max-h-48 overflow-auto pr-2">
-            {cart.map(item => (
+            {cart.map((item) => (
               <li key={item._id} className="flex justify-between items-center text-sm">
                 <span className="truncate">{item.name}</span>
-                <button onClick={() => removeFromCart(item._id)} className="text-red-600 text-xs">
+                <button
+                  onClick={() => removeFromCart(item._id)}
+                  className="text-red-600 text-xs"
+                >
                   Remove
                 </button>
               </li>
